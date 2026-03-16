@@ -152,6 +152,11 @@
             color: white;
         }
         
+        .prediction-badge.medium-risk {
+            background: #ffa502;
+            color: white;
+        }
+        
         .probability {
             font-size: 1.3rem;
             font-weight: 700;
@@ -176,11 +181,11 @@
             border-bottom: 2px solid #e0e0e0;
         }
         
-        .factors-card h3.positive {
+       .factors-card h3.negative {
             color: #2ed573;
         }
-        
-        .factors-card h3.negative {
+
+        .factors-card h3.positive {
             color: #ff4757;
         }
         
@@ -214,13 +219,13 @@
         }
         
         .factor-impact.positive {
-            background: #d4edda;
-            color: #155724;
+            background: #f8d7da;
+            color: #721c24;
         }
         
         .factor-impact.negative {
-            background: #f8d7da;
-            color: #721c24;
+            background: #d4edda;
+            color: #155724;
         }
         
         .llm-explanation {
@@ -303,13 +308,12 @@
                 
                 <div class="factors-section">
                     <div class="factors-card">
-                        <h3 class="positive">🔺 Factors Increasing Risk</h3>
-                        <div id="positiveFactors"></div>
-                    </div>
-                    
-                    <div class="factors-card">
-                        <h3 class="negative">🔻 Factors Decreasing Risk</h3>
+                        <h3 class="negative"><span style="color: #2ed573;">⬇️</span> Factors Decreasing Risk</h3>
                         <div id="negativeFactors"></div>
+                    </div>
+                    <div class="factors-card">
+                        <h3 class="positive"><span style="color: #ff4757;">⬆️</span> Factors Increasing Risk</h3>
+                        <div id="positiveFactors"></div>
                     </div>
                 </div>
                 
@@ -399,7 +403,13 @@
         function displayPrediction(data) {
             const badge = document.getElementById('predictionBadge');
             badge.textContent = data.prediction;
-            badge.className = 'prediction-badge ' + (data.prediction === 'High Risk' ? 'high-risk' : 'low-risk');
+            if (data.prediction === 'High Risk') {
+                badge.className = 'prediction-badge high-risk';
+            } else if (data.prediction === 'Medium Risk') {
+                badge.className = 'prediction-badge medium-risk';
+            } else {
+                badge.className = 'prediction-badge low-risk';
+            }
             
             document.getElementById('probability').textContent = (data.probability * 100).toFixed(1);
             

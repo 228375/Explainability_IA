@@ -194,7 +194,12 @@ class HRPredictor:
         negative_factors.sort(key=lambda x: abs(x["shap_value"]), reverse=True)
         
         # Determine prediction label
-        prediction = "High Risk" if prob > 0.5 else "Low Risk"
+        if prob >= 0.5:
+            prediction = "High Risk"
+        elif prob >= 0.25:
+            prediction = "Medium Risk"
+        else:
+            prediction = "Low Risk"
         
         # Calculate tenure for response
         hire_date = pd.to_datetime(emp_row['DateofHire'])
