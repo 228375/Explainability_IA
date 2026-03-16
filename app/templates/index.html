@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR AI Explainer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .input-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            flex: 1;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result {
+            display: none;
+        }
+        
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .prediction-badge {
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .prediction-badge.high-risk {
+            background: #ff4757;
+            color: white;
+        }
+        
+        .prediction-badge.low-risk {
+            background: #2ed573;
+            color: white;
+        }
+        
+        .probability {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .factors-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        .factors-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .factors-card h3 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .factors-card h3.positive {
+            color: #2ed573;
+        }
+        
+        .factors-card h3.negative {
+            color: #ff4757;
+        }
+        
+        .factor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .factor-item:last-child {
+            border-bottom: none;
+        }
+        
+        .factor-name {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .factor-value {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .factor-impact {
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .factor-impact.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .factor-impact.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .llm-explanation {
+            margin-top: 25px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+        }
+        
+        .llm-explanation h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .llm-explanation p {
+            line-height: 1.7;
+            color: #444;
+            margin-bottom: 15px;
+        }
+        
+        .caution {
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 10px;
+            color: #856404;
+            font-size: 0.9rem;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .factors-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-section {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 HR AI Explainer</h1>
+            <p>Predict employee turnover risk with AI-powered explanations</p>
+        </div>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="employeeIndex">Employee Index (0-310)</label>
+                    <input type="number" id="employeeIndex" min="0" max="310" value="0" placeholder="Enter employee index">
+                </div>
+                <button class="btn" onclick="getPrediction()">Analyze Employee</button>
+            </div>
+            
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Analyzing employee data...</p>
+            </div>
+            
+            <div id="error" class="error" style="display: none;"></div>
+            
+            <div id="result" class="result">
+                <div class="result-header">
+                    <div>
+                        <div class="prediction-badge" id="predictionBadge"></div>
+                    </div>
+                    <div class="probability">
+                        Leaving Probability: <span id="probability"></span>%
+                    </div>
+                </div>
+                
+                <div class="factors-section">
+                    <div class="factors-card">
+                        <h3 class="positive">🔺 Factors Increasing Risk</h3>
+                        <div id="positiveFactors"></div>
+                    </div>
+                    
+                    <div class="factors-card">
+                        <h3 class="negative">🔻 Factors Decreasing Risk</h3>
+                        <div id="negativeFactors"></div>
+                    </div>
+                </div>
+                
+                <div class="llm-explanation" id="llmExplanation" style="display: none;">
+                    <h3>💡 AI Explanation</h3>
+                    <p id="summary"></p>
+                    <p id="possibleExplanation"></p>
+                    <p id="detailedExplanation"></p>
+                    <div class="caution" id="caution"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Format feature name for display
+        function formatFeatureName(feature) {
+            const nameMap = {
+                'RecruitmentSource_Enc': 'Recruitment Source',
+                'Position_Enc': 'Position',
+                'DeptID': 'Department',
+                'PerfScoreID': 'Performance Score',
+                'EngagementSurvey': 'Engagement Survey',
+                'EmpSatisfaction': 'Employee Satisfaction',
+                'SpecialProjectsCount': 'Special Projects',
+                'DaysLateLast30': 'Days Late (30d)'
+            };
+            return nameMap[feature] || feature.replace('_Enc', '').replace(/_/g, ' ');
+        }
+        
+        // Format value for display
+        function formatValue(feature, value) {
+            if (feature === 'Salary') {
+                return Number(value).toLocaleString('fr-FR') + ' $';
+            } else if (feature === 'Tenure') {
+                return Math.round(value * 10) / 10 + ' years';
+            } else if (feature === 'Absences') {
+                return value + 'd';
+            } else if (feature === 'DaysLateLast30') {
+                return value + 'd';
+            } else if (feature === 'EngagementSurvey') {
+                return value + '/5';
+            } else if (feature === 'EmpSatisfaction') {
+                return value + '/5';
+            }
+            return value;
+        }
+        
+        async function getPrediction() {
+            const index = document.getElementById('employeeIndex').value;
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const result = document.getElementById('result');
+            
+            // Reset
+            error.style.display = 'none';
+            result.style.display = 'none';
+            loading.style.display = 'block';
+            
+            try {
+                // Get prediction
+                const response = await fetch(`/predict/${index}`);
+                if (!response.ok) {
+                    throw new Error('Failed to get prediction');
+                }
+                const data = await response.json();
+                
+                // Display prediction
+                displayPrediction(data);
+                
+                // Get LLM explanation
+                const explainResponse = await fetch(`/predict/${index}/explain`);
+                if (explainResponse.ok) {
+                    const explainData = await explainResponse.json();
+                    displayExplanation(explainData);
+                }
+                
+                loading.style.display = 'none';
+                result.style.display = 'block';
+            } catch (err) {
+                loading.style.display = 'none';
+                error.textContent = 'Error: ' + err.message;
+                error.style.display = 'block';
+            }
+        }
+        
+        function displayPrediction(data) {
+            const badge = document.getElementById('predictionBadge');
+            badge.textContent = data.prediction;
+            badge.className = 'prediction-badge ' + (data.prediction === 'High Risk' ? 'high-risk' : 'low-risk');
+            
+            document.getElementById('probability').textContent = (data.probability * 100).toFixed(1);
+            
+            // Display positive factors
+            const positiveDiv = document.getElementById('positiveFactors');
+            positiveDiv.innerHTML = data.top_positive_factors.map(f => {
+                let displayValue = f.display_value || f.value;
+                displayValue = formatValue(f.feature, displayValue);
+                return `
+                    <div class="factor-item">
+                        <div>
+                            <div class="factor-name">${formatFeatureName(f.feature)}</div>
+                            <div class="factor-value">${displayValue}</div>
+                        </div>
+                        <span class="factor-impact positive">+${(f.shap_value * 100).toFixed(1)}%</span>
+                    </div>
+                `;
+            }).join('');
+            
+            // Display negative factors
+            const negativeDiv = document.getElementById('negativeFactors');
+            negativeDiv.innerHTML = data.top_negative_factors.map(f => {
+                let displayValue = f.display_value || f.value;
+                displayValue = formatValue(f.feature, displayValue);
+                return `
+                    <div class="factor-item">
+                        <div>
+                            <div class="factor-name">${formatFeatureName(f.feature)}</div>
+                            <div class="factor-value">${displayValue}</div>
+                        </div>
+                        <span class="factor-impact negative">${(f.shap_value * 100).toFixed(1)}%</span>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function displayExplanation(data) {
+            document.getElementById('llmExplanation').style.display = 'block';
+            document.getElementById('summary').textContent = data.summary;
+            document.getElementById('possibleExplanation').textContent = '💭 ' + (data.possible_explanation || '');
+            document.getElementById('detailedExplanation').textContent = data.detailed_explanation;
+            document.getElementById('caution').textContent = '⚠️ ' + data.caution;
+        }
+        
+        // Load initial prediction
+        getPrediction();
+    </script>
+</body>
+</html>
