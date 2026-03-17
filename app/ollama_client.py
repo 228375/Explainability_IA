@@ -5,6 +5,7 @@ import httpx
 from app.schemas import ExplanationRequest, ExplanationResponse
 from app.schemas import LLMExplanationPayload
 from app.settings import get_settings
+from app.security import validate_output
 
 
 settings = get_settings()
@@ -37,8 +38,13 @@ def generate_explanation(
     if not text:
         raise RuntimeError(f"Ollama returned empty response: {raw_payload}")
 
+    # Validate output for potential injection attempts
+    validated_text = validate_output(text)
+    if validated_text is None:
+        raise RuntimeError("Output validation failed: potential prompt injection detected")
+
     try:
-        parsed_json = json.loads(text)
+        parsed_json = json.loads(validated_text)
     except json.JSONDecodeError as exc:
         raise RuntimeError(
             f"Ollama returned invalid JSON: {text}"

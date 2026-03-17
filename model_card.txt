@@ -1,0 +1,76 @@
+================================================================================
+                           CARTE MODÈLE
+     Système de Prédiction du Turnover Employés - Hackathon IA x RH
+================================================================================
+
+PRÉSENTATION GÉNÉRALE
+---------------------
+Cette solution a été développée afin d'aider les ressources humaines à identifier 
+les employés présentant un risque de démission et à comprendre les facteurs 
+qui influencent cette décision. Elle combine un modèle de machine learning 
+explicable et un grand modèle de langage pour générer des explications claires.
+
+ARCHITECTURE DE LA SOLUTION
+----------------------------
+
+1. Modèle de Prédiction (Machine Learning)
+   • Algorithme : Random Forest composé de 200 arbres de décision
+   • Fonction : Analyser les données disponibles pour estimer la probabilité 
+     qu'un employé quitte l'entreprise
+   • Avantage : Robustesse grâce à l'agrégation de multiples estimateurs
+   • Empreinte : Environ 1 Mo (solution légère et performante)
+
+2. Module d'Explicabilité (SHAP)
+   • Technologie : SHAP (SHapley Additive exPlanations)
+   • Fonction : Identifier et quantifier l'impact de chaque variable sur la 
+     prédiction
+   • Résultat : Affichage des facteurs augmentant ou diminuant le risque
+
+3. Génération d'Explications (LLM)
+   • Modèle : Gemma 3 1B via Ollama
+   • Fonction : Convertir les données techniques en explications en langage 
+     naturel
+   • Configuration : Température de 0,3 (réponses factuelles et cohérentes)
+   • Confidentialité : Fonctionne en local, aucune donnée transmise à 
+     l'extérieur
+
+DONNÉES UTILISÉES
+-----------------
+• Source : Dataset HR synthétique (inspiré de Kaggle)
+• Anonymisation : Les données ont été anonymisées au préalable (noms remplacés 
+  par des identifiants, emails supprimés)
+• Volume : 311 employés
+• Distribution : 66% maintien / 34% départ
+• Variables principales : Salaire, Satisfaction, Engagement, Performance, 
+  Ancienneté
+
+Note : Les attributs sensibles (genre, ethnicité) ne sont pas utilisés par 
+le modèle afin d'éviter les biais algorithmiques.
+
+LIMITATIONS CONNUES
+-------------------
+• Les données sont synthétiques et peuvent ne pas refléter des situations 
+  réelles
+• Déséquilibre entre les classes (employés restés vs partis)
+• Certains facteurs contextuels ne sont pas captés (relations hiérarchiques, 
+  culture d'équipe)
+
+MESURES DE SÉCURITÉ
+-------------------
+• Anonymisation des données : Les données ont été anonymisées au préalable 
+  (noms remplacés par des identifiants, emails supprimés) - Conformité RGPD
+• Validation et bornage des entrées utilisateur
+• Protection contre les injections de prompt
+• Exécution locale d'Ollama (aucune donnée transmise à des tiers)
+• Configuration sensible stockée dans les variables d'environnement
+
+UTILITÉ POUR LES RH
+-------------------
+• Visualisation claire des facteurs de risque
+• Obligation de validation humaine (le modèle assiste, ne décide pas)
+• Explications accessibles aux non-techniciens
+• Solution légère exécutable sur un serveur standard
+
+================================================================================
+Document préparé pour le Hackathon IA x RH | 2024
+================================================================================

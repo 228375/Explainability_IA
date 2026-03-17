@@ -1,6 +1,7 @@
 from typing import List
 
 from app.schemas import ExplanationRequest, ShapFactor
+from app.security import sanitize_input, sanitize_factor_value
 
 
 def format_factor_list(factors: List[ShapFactor]) -> str:
@@ -10,8 +11,8 @@ def format_factor_list(factors: List[ShapFactor]) -> str:
     return "\n".join(
         [
             (
-                f"- feature: {factor.feature} | "
-                f"value: {factor.display_value if factor.display_value is not None else factor.value} | "
+                f"- feature: {sanitize_factor_value(factor.feature)} | "
+                f"value: {sanitize_factor_value(factor.display_value if factor.display_value is not None else factor.value)} | "
                 f"shap_value: {factor.shap_value}"
             )
             for factor in factors
@@ -22,6 +23,11 @@ def format_factor_list(factors: List[ShapFactor]) -> str:
 def build_prompt(data: ExplanationRequest) -> str:
     positive = format_factor_list(data.top_positive_factors)
     negative = format_factor_list(data.top_negative_factors)
+
+    # Sanitize input values
+    sanitized_id = sanitize_input(data.candidate_id)
+    sanitized_pred = sanitize_input(data.prediction)
+    sanitized_prob = sanitize_input(data.probability)
 
     return f"""
 You are an HR decision-support assistant.
@@ -42,9 +48,9 @@ Strict rules:
   summary, possible_explanation, detailed_explanation, main_factors, caution
 
 Input data:
-- candidate_id: {data.candidate_id}
-- prediction: {data.prediction}
-- probability: {data.probability}
+- candidate_id: {sanitized_id}
+- prediction: {sanitized_pred}
+- probability: {sanitized_prob}
 
 Positive factors:
 {positive}

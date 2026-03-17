@@ -51,7 +51,7 @@ pip install -r requirements.txt
 
 4. **Install Ollama** (for LLM explanations):
    - Download from: https://ollama.com
-   - Run: `ollama pull gemma3:12b`
+   - Run: `ollama pull gemma3:1b`
 
 ## Running the Application
 
