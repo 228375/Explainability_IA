@@ -4,6 +4,7 @@ An AI-powered employee turnover prediction system with explainable AI (SHAP) and
 
 ## Features
 
+- **Security**: Prompt injection protection and input sanitization
 - **ML Model**: Random Forest classifier for predicting employee turnover
 - **Explainability**: SHAP values to understand why an employee might leave
 - **LLM Integration**: Uses Ollama (Gemma 3) for natural language explanations
@@ -19,6 +20,7 @@ rh_ai_explainer/
 │   ├── ollama_client.py    # LLM integration
 │   ├── prompts.py           # Prompt templates
 │   ├── schemas.py          # Pydantic schemas
+|   ├── security.py         # Security & prompt injection protection
 │   ├── settings.py         # Configuration
 │   └── templates/
 │       └── index.html      # Frontend UI
